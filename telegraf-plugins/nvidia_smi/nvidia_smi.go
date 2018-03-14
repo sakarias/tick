@@ -38,8 +38,8 @@ func main() {
     fmt.Fprintf(os.Stderr, "Bin path does not exists: %s", *binPath)
     return // exit
   }
-
-  metrics := "fan.speed,memory.total,memory.used,memory.free,pstate,temperature.gpu,name,uuid,compute_mode"
+  // nvidia-smi --format=csv --query-gpu=power.draw,utilization.gpu,fan.speed,temperature.gpu
+  metrics := "fan.speed,memory.total,memory.used,memory.free,pstate,temperature.gpu,name,uuid,compute_mode,power.draw,utilization.gpu"
   results := getResult(*binPath, metrics, *verbose, *gpuId)
 
   if results == "" {
@@ -58,6 +58,10 @@ func main() {
   fmt.Printf("memory_total=%s,", strings.TrimSpace(splitResults[1])) // they
   fmt.Printf("memory_used=%s,", strings.TrimSpace(splitResults[2]))  // are
   fmt.Printf("memory_free=%s,", strings.TrimSpace(splitResults[3]))  // MiB
+
+  //fmt.Printf("power_draw=%s,", strings.TrimSpace(splitResults[9]))    // W
+  fmt.Printf("power_draw=\"%s\",", strings.TrimSpace(strings.Replace(splitResults[9], "W", "", -1)))     // W
+  fmt.Printf("utilization=%s,", strings.TrimSpace(splitResults[10]))  // % 0-100
 
   fmt.Printf("pstate=%s,", strings.TrimSpace(strings.Replace(splitResults[4], "P", "", -1))) // strip the P
   fmt.Printf("temperature=%s\n", strings.TrimSpace(splitResults[5])) // in degrees Celcius
